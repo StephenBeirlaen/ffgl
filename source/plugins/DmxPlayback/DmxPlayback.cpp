@@ -73,8 +73,8 @@ DmxPlayback::DmxPlayback() :
 		layer.recordedSequences         = layerRecordedSequences;
 		layer.activeClipParameterId     = nextParameterId++;
 		layer.activeClipParameterValue  = 1.0;
-		layer.speedParameterId          = nextParameterId++;
-		layer.speedParameterValue       = 1.0;
+		layer.framePositionParameterId  = nextParameterId++;
+		layer.framePositionParameterValue = 1.0;
 		layer.opacityParameterId        = nextParameterId++;
 		layer.opacityParameterValue     = 1.0;
 		layer.layerNumber               = layerIndex + 1;
@@ -115,11 +115,11 @@ DmxPlayback::DmxPlayback() :
 			SetParamElementInfo( layer.activeClipParameterId, clipCounter, std::to_string( clipCounter + 1 ).c_str(), (float)(clipCounter + 1));
 		}
 
-		// Configure a speed parameter
-		std::stringstream speed_ss;
-		speed_ss << "L" << std::to_string(layer.layerNumber) << " speed";
-		SetParamInfof( layer.speedParameterId, speed_ss.str().c_str(), FF_TYPE_STANDARD );
-		SetParamRange( layer.speedParameterId, 0, 10 );
+		// Configure a frame position parameter
+		std::stringstream frame_position_ss;
+		frame_position_ss << "L" << std::to_string( layer.layerNumber ) << " frame";
+		SetParamInfof( layer.framePositionParameterId, frame_position_ss.str().c_str(), FF_TYPE_STANDARD );
+		SetParamRange( layer.framePositionParameterId, 0, 1 );
 		
 		// Configure an opacity parameter
 		std::stringstream opacity_ss;
@@ -154,11 +154,6 @@ FFResult DmxPlayback::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 	//FFGL requires us to leave the context in a default state on return, so use this scoped binding to help us do that.
 	ScopedShaderBinding shaderBinding( shader.GetGLID() );
 
-	auto timeNow = std::chrono::high_resolution_clock::now();
-	timeElapsedSinceStart = std::chrono::duration< float, std::milli >( timeNow - timeStart ).count() / 1000.0f;
-
-	float currentFrameNumberRealtime = timeElapsedSinceStart / artnetFrameInterval;
-
 	// To represent 512 DMX channels, construct an array for a 32x16 px texture consisting of 2 color channels
 	// Every nth element (starting from 0) contains the RED color channel
 	// Every n+1th element (starting from 0) contains the ALPHA color channel
@@ -173,9 +168,12 @@ FFResult DmxPlayback::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 			continue;
 		}
 
-		size_t numberOfFramesInSequence                = activeSequenceForLayer.frames.size();
-		uint32_t currentFrameNumberWithSpeedMultiplier = uint32_t( currentFrameNumberRealtime * layer.speedParameterValue );
-		size_t currentFrameNumberInSequence            = currentFrameNumberWithSpeedMultiplier % numberOfFramesInSequence;
+		size_t numberOfFramesInSequence     = activeSequenceForLayer.frames.size();
+		size_t currentFrameNumberInSequence = size_t( floor( layer.framePositionParameterValue * numberOfFramesInSequence ) );
+		if( currentFrameNumberInSequence == numberOfFramesInSequence )
+		{
+			currentFrameNumberInSequence--;
+		}
 
 		Frame &currentFrameForLayer = activeSequenceForLayer.frames.at( currentFrameNumberInSequence );
 
@@ -253,9 +251,9 @@ FFResult DmxPlayback::SetFloatParameter( unsigned int index, float value )
 			return FF_SUCCESS;
 		}
 
-		if( layer.speedParameterId == index )
+		if( layer.framePositionParameterId == index )
 		{
-			layer.speedParameterValue = value;
+			layer.framePositionParameterValue = value;
 
 			return FF_SUCCESS;
 		}
@@ -361,9 +359,9 @@ float DmxPlayback::GetFloatParameter( unsigned int index )
 			return layer.activeClipParameterValue;
 		}
 
-		if( layer.speedParameterId == index )
+		if( layer.framePositionParameterId == index )
 		{
-			return layer.speedParameterValue;
+			return layer.framePositionParameterValue;
 		}
 
 		if( layer.opacityParameterId == index )

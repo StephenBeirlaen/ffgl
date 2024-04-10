@@ -29,8 +29,8 @@ class Layer
 		float activeClipParameterValue;
 		std::uint8_t activeClipIndex;
 
-		FFUInt32 speedParameterId;
-		float speedParameterValue;
+		FFUInt32 framePositionParameterId;
+		float framePositionParameterValue;
 
 		FFUInt32 opacityParameterId;
 		float opacityParameterValue;
@@ -57,12 +57,6 @@ private:
 
 	const std::uint8_t numLayers = 5;
 	const std::uint8_t numSequencesPerLayer = 10;
-
-	float timeElapsedSinceStart = 0;
-	std::chrono::time_point< std::chrono::high_resolution_clock > timeStart = std::chrono::high_resolution_clock::now();
-
-	const float artnetFramesPerSecond = 44;
-	const float artnetFrameInterval   = 1.0f / artnetFramesPerSecond;
 
 	const std::uint16_t dataFrameLength = 32 * 16 * 2;
 	unsigned char dmxPixelDataFrame[ 32 * 16 * 2 ];
