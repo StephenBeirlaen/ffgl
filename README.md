@@ -1,4 +1,4 @@
-This is the Resolume fork of the FFGL repository. It is up to date and has Visual Studio and Xcode projects to compile 64 bit plugins that can be loaded by Resolume 7.0.3 and up.  
+This is my fork of the Resolume fork of the FFGL repository. It is up to date and has Visual Studio and Xcode projects to compile 64 bit plugins that can be loaded by Resolume 7.0.3 and up.  
 
 **Note for macOS developers:** *Resolume 7.11.0 has added native ARM support. This means that on Apple Sillicon it will run as a native ARM process. Native ARM processes cannot load x86_64 based plugins. To enable your plugin to be loaded you should build it as universal build. If your Xcode is up-to-date enough you can choose to build for "Any Mac (Apple Silicon, Intel)" instead of "My Mac" in the top left corner. Please read the [apple developer documentation](https://developer.apple.com/documentation/apple-silicon/building-a-universal-macos-binary) for more information about universal builds.*
 
@@ -8,6 +8,29 @@ If you do not want to be affected by the latest bugs you can use one of the stab
 You can find some help to get started with FFGL plugin development on the [wiki](https://github.com/resolume/ffgl/wiki).
 
 Also more examples are available on this [repo](https://github.com/flyingrub/ffgl/tree/more/).
+
+## Changes made by me
+
+Added:
+
+- DMX Playback source: This Source allows you to playback DMX recordings made using https://github.com/StephenBeirlaen/artnet-to-csv-recorder
+
+Compiling:
+
+- Make sure to build in Release mode for production usage
+
+Testing:
+
+- Add the `binaries\x64\Debug` directory as an FFGL plugins source in Resolume's preferences
+- Add the source or effect to test
+- To recompile, first you need to either remove all instances of the effect/source (this unloads it from memory), or close Resolume
+
+Debugging with Visual Studio:
+
+- Start Resolume
+- Debug -> Attach to process -> Arena.exe
+- Place breakpoint(s)
+- Add the effect or source
 
 ## Master branch changes since FFGL 2.2
 - Replaced glload by glew, enabling OpenGL 4.6 extensions to be used inside plugins. Plugins may need to add deps/glew.props to their project's property pages for them to link to the binary.
