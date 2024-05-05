@@ -4,16 +4,16 @@
 using namespace ffglex;
 
 static CFFGLPluginInfo PluginInfo(
-	PluginFactory< DmxPlayback >,  // Create method
-	"SB01",                        // Plugin unique ID
-	"DMX Playback",                // Plugin name
-	2,                             // API major version number
-	1,                             // API minor version number
-	1,                             // Plugin major version number
-	000,                           // Plugin minor version number
-	FF_SOURCE,                     // Plugin type
+	PluginFactory< DmxPlayback >,                       // Create method
+	"SB01",                                             // Plugin unique ID
+	"DMX Playback",                                     // Plugin name
+	2,                                                  // API major version number
+	1,                                                  // API minor version number
+	1,                                                  // Plugin major version number
+	000,                                                // Plugin minor version number
+	FF_SOURCE,                                          // Plugin type
 	"FFGL DMX recording playback plugin for Resolume 7",// Plugin description
-	"Stephen B"        // About
+	"Stephen B"                                         // About
 );
 
 static const char vertexShaderCode[] = R"(#version 410 core
@@ -28,7 +28,6 @@ void main()
 	uv = vUV;
 }
 )";
-
 
 static const char fragmentShaderCode[] = R"(#version 410 core
 uniform sampler2D DmxDataTexture;
@@ -62,7 +61,7 @@ DmxPlayback::DmxPlayback() :
 			RecordedSequence recordedSequence;
 
 			recordedSequence.sequenceNumber          = sequenceIndex + 1;
-			recordedSequence.recordingParameterId = nextParameterId++;
+			recordedSequence.recordingParameterId    = nextParameterId++;
 			recordedSequence.recordingParameterValue = "";
 
 			layerRecordedSequences.push_back( recordedSequence );
@@ -70,14 +69,14 @@ DmxPlayback::DmxPlayback() :
 
 		Layer layer;
 
-		layer.recordedSequences         = layerRecordedSequences;
-		layer.activeClipParameterId     = nextParameterId++;
-		layer.activeClipParameterValue  = 1.0;
-		layer.framePositionParameterId  = nextParameterId++;
+		layer.recordedSequences           = layerRecordedSequences;
+		layer.activeClipParameterId       = nextParameterId++;
+		layer.activeClipParameterValue    = 1.0;
+		layer.framePositionParameterId    = nextParameterId++;
 		layer.framePositionParameterValue = 1.0;
-		layer.opacityParameterId        = nextParameterId++;
-		layer.opacityParameterValue     = 1.0;
-		layer.layerNumber               = layerIndex + 1;
+		layer.opacityParameterId          = nextParameterId++;
+		layer.opacityParameterValue       = 1.0;
+		layer.layerNumber                 = layerIndex + 1;
 
 		layers.push_back( layer );
 	}
@@ -87,7 +86,7 @@ DmxPlayback::DmxPlayback() :
 	{
 		// Define the group name where parameters of this layer should be grouped into
 		std::stringstream group_name_ss;
-		group_name_ss << "Layer " << std::to_string(layer.layerNumber) << " recordings";	
+		group_name_ss << "Layer " << std::to_string(layer.layerNumber) << " recordings";
 
 		// Configure recording file parameters
 		for( auto& recordedSequence : layer.recordedSequences )
@@ -115,7 +114,7 @@ DmxPlayback::DmxPlayback() :
 		frame_position_ss << "L" << std::to_string( layer.layerNumber ) << " frame";
 		SetParamInfof( layer.framePositionParameterId, frame_position_ss.str().c_str(), FF_TYPE_STANDARD );
 		SetParamRange( layer.framePositionParameterId, 0, 1 );
-		
+
 		// Configure an opacity parameter
 		std::stringstream opacity_ss;
 		opacity_ss << "L" << std::to_string(layer.layerNumber) << " opacity";
@@ -202,12 +201,12 @@ FFResult DmxPlayback::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 
 	//Use the scoped binding so that the context state is restored to it's default as required by ffgl.
 	Scoped2DTextureBinding textureBinding( dmxDataTextureId );
-	
+
 	// Avoid color interpolation when sampling from the texture, with GL_NEAREST
 	// GL_NEAREST = Returns the value of the texture element that is nearest (in Manhattan distance) to the specified texture coordinates.
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-	
+
 	// Generate a texture from the input data. A pixel data format with only RED and ALPHA is not available, but as an alternative, GL_RG also has two color channels RED and GREEN.
 	// We can store the RED channel in the RED channel and the and ALPHA channel in the GREEN channel.
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RG8, 32, 16, 0, GL_RG, GL_UNSIGNED_BYTE, dmxPixelDataFrame );
@@ -309,7 +308,7 @@ FFResult DmxPlayback::SetTextParameter( unsigned int index, const char* value )
 				size_t numFrames = dmxRecordingData.at( 0 ).second.size();
 
 				std::vector< Frame > recordedFrames( 0 );
-				
+
 				for( size_t frameIndex = 0; frameIndex < numFrames; ++frameIndex )
 				{
 					Frame frame;
@@ -318,7 +317,7 @@ FFResult DmxPlayback::SetTextParameter( unsigned int index, const char* value )
 
 					for( auto& dmxChannelData : dmxRecordingData )
 					{
-						if( dmxChannelData.first < 1 || dmxChannelData.first > 512)
+						if( dmxChannelData.first < 1 || dmxChannelData.first > 512 )
 						{
 							continue;
 						}
@@ -335,7 +334,7 @@ FFResult DmxPlayback::SetTextParameter( unsigned int index, const char* value )
 				}
 
 				recordedSequence.recordingParameterValue = recordingFile;
-				recordedSequence.frames = recordedFrames;
+				recordedSequence.frames                  = recordedFrames;
 
 				return FF_SUCCESS;
 			}
