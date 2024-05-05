@@ -105,11 +105,6 @@ DmxPlayback::DmxPlayback() :
 		std::stringstream active_clip_ss;
 		active_clip_ss << "L" << std::to_string(layer.layerNumber) << " active clip";
 		SetOptionParamInfo( layer.activeClipParameterId, active_clip_ss.str().c_str(), numSequencesPerLayer, layer.activeClipParameterValue );
-		/*SetParamElementInfo( layer.activeClipParameterId, 0, "1", 1.0f );
-		SetParamElementInfo( layer.activeClipParameterId, 1, "2", 2.0f );
-		SetParamElementInfo( layer.activeClipParameterId, 2, "3", 3.0f );
-		SetParamElementInfo( layer.activeClipParameterId, 3, "4", 4.0f );
-		SetParamElementInfo( layer.activeClipParameterId, 4, "5", 5.0f );*/
 		for( std::uint8_t clipCounter = 0; clipCounter < numSequencesPerLayer; ++clipCounter )
 		{
 			SetParamElementInfo( layer.activeClipParameterId, clipCounter, std::to_string( clipCounter + 1 ).c_str(), (float)(clipCounter + 1));
