@@ -55,7 +55,7 @@ public:
 private:
 	std::vector< Layer > layers; // An inmemory map of all the source's layers and their parameters
 
-	const std::uint8_t numLayers = 8;
+	const std::uint8_t numLayers = 16;
 	const std::uint8_t numSequencesPerLayer = 10;
 
 	const std::uint16_t dataFrameLength = 32 * 16 * 2;
